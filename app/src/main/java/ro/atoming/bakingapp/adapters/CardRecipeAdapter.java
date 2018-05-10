@@ -16,7 +16,6 @@ import java.util.List;
 
 import ro.atoming.bakingapp.R;
 import ro.atoming.bakingapp.models.Recipe;
-import ro.atoming.bakingapp.models.RecipeStep;
 import ro.atoming.bakingapp.ui.DetailActivity;
 
 /**
@@ -52,9 +51,6 @@ public class CardRecipeAdapter extends RecyclerView.Adapter<CardRecipeAdapter.Ca
     public void onBindViewHolder(@NonNull CardViewHolder holder, int position) {
         Recipe recipe = mRecipeList.get(position);
         holder.recipeName.setText(recipe.getName());
-        List<RecipeStep> recipeSteps = recipe.getRecipeSteps();
-        String mRecipeStep = recipeSteps.toString();
-        Log.d(LOG_TAG, "THIS ARE THE STEPS " + mRecipeStep);
         holder.servings.setText(String.valueOf(recipe.getServings()));
     }
 

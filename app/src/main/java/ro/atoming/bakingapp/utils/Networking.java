@@ -97,73 +97,41 @@ public class Networking {
     }
 
     private static List<Recipe> extractJsonResponse(String jsonResponse) {
-        int recipeId = 0;
-        String recipeName = "";
-        ArrayList<Ingredient> ingredientList = new ArrayList<>();
-        ArrayList<RecipeStep> recipeSteps = new ArrayList<>();
-        int servings = 0;
-        int quantity = 0;
-        String measure = "";
-        String ingredient = "";
-        int stepId = 0;
-        String shortDescription = "";
-        String description = "";
-        String videoUrl = "";
         List<Recipe> recipeList = new ArrayList<>();
         try {
             JSONArray recipeArray = new JSONArray(jsonResponse);
             for (int i = 0; i < recipeArray.length(); i++) {
                 JSONObject jsonRecipe = recipeArray.getJSONObject(i);
-                if (jsonRecipe.has(RECIPE_ID)) {
-                    recipeId = jsonRecipe.getInt(RECIPE_ID);
-                    Log.v(LOG_TAG, "RECIPE ID -" + recipeId);
+                int recipeId = jsonRecipe.optInt(RECIPE_ID);
+                Log.v(LOG_TAG, "RECIPE ID -" + recipeId);
+
+                String recipeName = jsonRecipe.optString(RECIPE_NAME);
+                Log.v(LOG_TAG, "RECIPE NAME -" + recipeName);
+
+                JSONArray ingredientsArray = jsonRecipe.getJSONArray(RECIPE_INGREDIENTS);
+                ArrayList<Ingredient> ingredientList = new ArrayList<>();
+                for (int j = 0; j < ingredientsArray.length(); j++) {
+                    JSONObject currentIngredient = ingredientsArray.getJSONObject(j);
+                    int quantity = currentIngredient.optInt(INGREDIENT_QUANTITY);
+                    String measure = currentIngredient.optString(INGREDIENT_MEASURE);
+                    String ingredientName = currentIngredient.optString(INGREDIENT_NAME);
+                    Ingredient ingredients = new Ingredient(quantity, measure, ingredientName);
+                    ingredientList.add(ingredients);
                 }
-                if (jsonRecipe.has(RECIPE_NAME)) {
-                    recipeName = jsonRecipe.getString(RECIPE_NAME);
-                    Log.v(LOG_TAG, "RECIPE NAME -" + recipeName);
+                JSONArray recipeStepsArray = jsonRecipe.getJSONArray(RECIPE_STEPS);
+                ArrayList<RecipeStep> recipeSteps = new ArrayList<>();
+                for (int k = 0; k < recipeStepsArray.length(); k++) {
+                    JSONObject jsonRecipeStep = recipeStepsArray.getJSONObject(k);
+                    int stepId = jsonRecipeStep.optInt(STEP_ID);
+                    String shortDescription = jsonRecipeStep.optString(STEP_SHORT_DESCRIPTION);
+                    String description = jsonRecipeStep.optString(STEP_DESCRIPTION);
+                    String videoUrl = jsonRecipeStep.optString(STEP_VIDEO);
+                    RecipeStep currentStep = new RecipeStep(stepId, shortDescription, description, videoUrl);
+                    recipeSteps.add(currentStep);
+                    Log.v(LOG_TAG, "THIS IS THE RECIPESTEP LIST " + recipeSteps.toString());
                 }
-                //TODO 1 create separate methods for Ingredients Json
-                if (jsonRecipe.has(RECIPE_INGREDIENTS)) {
-                    JSONArray ingredientsArray = jsonRecipe.getJSONArray(RECIPE_INGREDIENTS);
-                    for (int j = 0; j < ingredientsArray.length(); j++) {
-                        JSONObject currentIngredient = ingredientsArray.getJSONObject(j);
-                        if (currentIngredient.has(INGREDIENT_QUANTITY)) {
-                            quantity = currentIngredient.getInt(INGREDIENT_QUANTITY);
-                        }
-                        if (currentIngredient.has(INGREDIENT_MEASURE)) {
-                            measure = currentIngredient.getString(INGREDIENT_MEASURE);
-                        }
-                        if (currentIngredient.has(INGREDIENT_NAME)) {
-                            ingredient = currentIngredient.getString(INGREDIENT_NAME);
-                        }
-                        Ingredient ingredients = new Ingredient(quantity, measure, ingredient);
-                        ingredientList.add(ingredients);
-                    }
-                }
-                //TODO 2 create separate method to extract Recipe Steps Json
-                if (jsonRecipe.has(RECIPE_STEPS)) {
-                    JSONArray recipeStepsArray = jsonRecipe.getJSONArray(RECIPE_STEPS);
-                    for (int k = 0; k < recipeStepsArray.length(); k++) {
-                        JSONObject jsonRecipeStep = recipeStepsArray.getJSONObject(k);
-                        if (jsonRecipeStep.has(STEP_ID)) {
-                            stepId = jsonRecipeStep.getInt(STEP_ID);
-                        }
-                        if (jsonRecipeStep.has(STEP_SHORT_DESCRIPTION)) {
-                            shortDescription = jsonRecipeStep.getString(STEP_SHORT_DESCRIPTION);
-                        }
-                        if (jsonRecipeStep.has(STEP_DESCRIPTION)) {
-                            description = jsonRecipeStep.getString(STEP_DESCRIPTION);
-                        }
-                        if (jsonRecipeStep.has(STEP_VIDEO)) {
-                            videoUrl = jsonRecipeStep.getString(STEP_VIDEO);
-                        }
-                        RecipeStep currentStep = new RecipeStep(stepId, shortDescription, description, videoUrl);
-                        recipeSteps.add(currentStep);
-                    }
-                }
-                if (jsonRecipe.has(RECIPE_SERVINGS)) {
-                    servings = jsonRecipe.getInt(RECIPE_SERVINGS);
-                }
+                int servings = jsonRecipe.optInt(RECIPE_SERVINGS);
+
                 Recipe currentRecipe = new Recipe(recipeId, recipeName, ingredientList, recipeSteps, servings);
                 recipeList.add(currentRecipe);
             }
@@ -171,6 +139,52 @@ public class Networking {
             Log.e(LOG_TAG, "Problem parsing JSON response !");
         }
         return recipeList;
+    }
+
+    private static RecipeStep[] extractSteps(String stepsJson) throws JSONException {
+        int stepId = 0;
+        String shortDescription = "";
+        String description = "";
+        String videoUrl = "";
+        List<RecipeStep>recipeSteps = new ArrayList<>();
+        try{
+            JSONArray stepsArray = new JSONArray(stepsJson);
+            for (int i = 0; i<stepsArray.length();i++){
+                JSONObject currentStep = stepsArray.getJSONObject(i);
+                stepId = currentStep.optInt(STEP_ID);
+                shortDescription = currentStep.optString(STEP_SHORT_DESCRIPTION);
+                description = currentStep.optString(STEP_DESCRIPTION);
+                videoUrl = currentStep.optString(STEP_VIDEO);
+                RecipeStep recipeStep = new RecipeStep(stepId,shortDescription,description,videoUrl);
+                recipeSteps.add(recipeStep);
+            }
+
+        }catch (JSONException e){
+            e.printStackTrace();
+        }
+        return recipeSteps.toArray(new RecipeStep[recipeSteps.size()]);
+    }
+
+
+    private static Ingredient[] extractIngredients(String ingredientsJson) throws JSONException {
+        int quantity = 0;
+        String measure = "";
+        String ingredientName = "";
+        List<Ingredient>ingredients = new ArrayList<>();
+        try{
+            JSONArray ingredientsArray = new JSONArray(ingredientsJson);
+            for (int j = 0; j<ingredientsArray.length();j++){
+                JSONObject currentIngredient = ingredientsArray.getJSONObject(j);
+                quantity = currentIngredient.optInt(INGREDIENT_QUANTITY);
+                measure = currentIngredient.optString(INGREDIENT_MEASURE);
+                ingredientName = currentIngredient.optString(INGREDIENT_NAME);
+                Ingredient ingredient = new Ingredient(quantity,measure,ingredientName);
+                ingredients.add(ingredient);
+            }
+        }catch (JSONException e){
+            e.printStackTrace();
+        }
+        return ingredients.toArray(new Ingredient[ingredients.size()]);
     }
 
 }

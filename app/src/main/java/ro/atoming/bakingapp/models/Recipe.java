@@ -3,7 +3,6 @@ package ro.atoming.bakingapp.models;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -18,7 +17,7 @@ public class Recipe implements Parcelable{
     private List<RecipeStep> recipeSteps;
     private int servings;
 
-    public Recipe(int recipeId, String name, ArrayList<Ingredient> ingredients, ArrayList<RecipeStep> recipeSteps,
+    public Recipe(int recipeId, String name, List<Ingredient> ingredients, List<RecipeStep> recipeSteps,
                   int servings) {
         this.recipeId = recipeId;
         this.name = name;
@@ -67,7 +66,7 @@ public class Recipe implements Parcelable{
         return ingredients;
     }
 
-    public void setIngredients(ArrayList<Ingredient> ingredients) {
+    public void setIngredients(List<Ingredient> ingredients) {
         this.ingredients = ingredients;
     }
 
@@ -75,7 +74,7 @@ public class Recipe implements Parcelable{
         return recipeSteps;
     }
 
-    public void setRecipeSteps(ArrayList<RecipeStep> recipeSteps) {
+    public void setRecipeSteps(List<RecipeStep> recipeSteps) {
         this.recipeSteps = recipeSteps;
     }
 

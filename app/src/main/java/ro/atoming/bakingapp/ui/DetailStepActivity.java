@@ -5,11 +5,11 @@ import android.support.v7.app.AppCompatActivity;
 
 import ro.atoming.bakingapp.R;
 
-public class DetailActivity extends AppCompatActivity {
+public class DetailStepActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_detail);
+        setContentView(R.layout.activity_detail_step);
     }
 }

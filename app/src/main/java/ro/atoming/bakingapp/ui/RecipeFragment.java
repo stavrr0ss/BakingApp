@@ -21,7 +21,7 @@ import ro.atoming.bakingapp.models.RecipeStep;
  * Created by Bogdan on 5/7/2018.
  */
 
-public class RecipeFragment extends Fragment{
+public class RecipeFragment extends Fragment implements RecipeStepsAdapter.OnStepListener{
 
     public RecipeFragment(){}
     private List<RecipeStep> mStepList;
@@ -36,12 +36,11 @@ public class RecipeFragment extends Fragment{
         Intent intent = getActivity().getIntent();
 
         Bundle bundle = intent.getBundleExtra("recipeBundle");
-        //bundle = this.getArguments();
         if(bundle!=null){
             mRecipe = bundle.getParcelable("recipe");
         }
         mStepList = mRecipe.getRecipeSteps();
-        RecipeStepsAdapter stepsAdapter = new RecipeStepsAdapter(mStepList,getActivity());
+        RecipeStepsAdapter stepsAdapter = new RecipeStepsAdapter(mStepList,getActivity(),this);
         recyclerView.setAdapter(stepsAdapter);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -49,14 +48,7 @@ public class RecipeFragment extends Fragment{
     }
 
     @Override
-    public void onActivityCreated(@Nullable Bundle bundle) {
-        super.onActivityCreated(bundle);
-       // Intent intent = getActivity().getIntent();
-       // bundle = intent.getBundleExtra("recipeBundle");
-        //bundle = this.getArguments();
-       // if(bundle!=null){
-       //     mRecipe = bundle.getParcelable("recipe");
-       // }
-        //mStepList = mRecipe.getRecipeSteps();
+    public void onStepClick(int clickedItem) {
+
     }
 }
